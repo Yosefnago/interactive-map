@@ -19,16 +19,16 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "allowedCommonJsDependencies": [
-              "leaflet"
+              "leaflet",
+              "leaflet.markercluster"
             ],
             "assets": [
+              { "glob": "**/*", "input": "public" },
+              { "glob": "**/*", "input": "src/assets", "output": "assets" },
+              { "glob": "**/*", "input": "node_modules/leaflet/dist/images/", "output": "assets" },
               {
-                "glob": "**/*",
-                "input": "public"
-              },
-              {
-                "glob": "**/*",
-                "input": "src/assets",
+                "glob": "leaflet.markercluster.js",
+                "input": "node_modules/leaflet.markercluster/dist/",
                 "output": "assets"
               }
             ],

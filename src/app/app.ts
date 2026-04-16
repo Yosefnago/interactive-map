@@ -3,14 +3,19 @@ import {
   HostListener, ChangeDetectorRef, NgZone, ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DATA_LIST, PopUpData, MacroAlgaeInfo, MicroAlgaeInfo, CyanobacteriaInfo } from './app.data';
 import * as L from 'leaflet';
-import { DATA_LIST, PopUpData, MacroAlgaeInfo, MicroAlgaeInfo } from './app.data';
+
 
 const REGION_BOUNDS: L.LatLngBoundsExpression = [[0, -20], [75, 100]];
 
 type AlgaeItem = MacroAlgaeInfo | MicroAlgaeInfo;
 type FilteredResult = { country: string; type: string; name: string };
-type PartnerPopup = PopUpData & { macroAlgae: MacroAlgaeInfo[]; microAlgae: MicroAlgaeInfo[] };
+type PartnerPopup = PopUpData & { 
+  macroAlgae: MacroAlgaeInfo[]; 
+  microAlgae: MicroAlgaeInfo[]; 
+  cyanobacteriaAlgae: CyanobacteriaInfo[] 
+};
 
 @Component({
   selector: 'app-root',
@@ -24,10 +29,11 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
 
   private map!: L.Map;
   private cachedGeoJson: any = null;
-  private markerGroup: L.LayerGroup = L.layerGroup();
+  private markerGroup!: any;
   private resizeTimeout: ReturnType<typeof setTimeout> | null = null;
   private partnerAlgaeCache = new Map<PopUpData, AlgaeItem[]>();
 
+  public sortedPartners: PopUpData[] = [];
   public popupPartner: PartnerPopup | null = null;
   public selectedAlgae: AlgaeItem | null = null;
   public selectedAlgaeType = '';
@@ -40,17 +46,25 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   constructor(private cdr: ChangeDetectorRef, private zone: NgZone) { }
 
   ngOnInit(): void {
-    // Build the data list cache once
-    DATA_LIST.forEach(p => {
-      this.partnerAlgaeCache.set(p, [...(p.macroAlgae ?? []), ...(p.microAlgae ?? [])]);
+    this.sortedPartners = [...DATA_LIST].sort((a, b) => 
+      (a.name || '').localeCompare(b.name || '')
+    );
+
+    this.sortedPartners.forEach(p => {
+      this.partnerAlgaeCache.set(p, [...(p.macroAlgae ?? []), ...(p.microAlgae ?? []), ...(p.cyanobacteriaAlgae ?? [])]);
     });
     this.extractFilterOptions();
   }
 
   ngAfterViewInit(): void {
     this.zone.runOutsideAngular(() => {
-      this.initMap();
-      this.map.whenReady(() => this.map.invalidateSize());
+      const script = document.createElement('script');
+      script.src = 'assets/leaflet.markercluster.js';
+      script.onload = () => {
+        this.initMap();
+        requestAnimationFrame(() => this.map.invalidateSize());
+      };
+      document.head.appendChild(script);
     });
   }
 
@@ -86,18 +100,20 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   private initMap(): void {
     this.map = L.map('map', {
       renderer: L.canvas({ tolerance: 3 }),
-      minZoom: 3.5, maxZoom: 15,
-      zoomSnap: 0, zoomDelta: 1,
+      minZoom: 3.5, 
+      maxZoom: 8,
+      zoomDelta: 1,
+      zoomSnap: 0,
+      zoomControl: false,
       maxBounds: REGION_BOUNDS,
       maxBoundsViscosity: 1.0,
-      zoomControl: true
     }).fitBounds(REGION_BOUNDS);
 
     delete (L.Icon.Default.prototype as any)._getIconUrl;
     L.Icon.Default.mergeOptions({
-      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      iconUrl: 'assets/marker-icon.png',
+      iconRetinaUrl: 'assets/marker-icon-2x.png',
+      shadowUrl: 'assets/marker-shadow.png',
     });
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -105,36 +121,50 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
       crossOrigin: true
     }).addTo(this.map);
+    
+    this.markerGroup = (window as any).L.markerClusterGroup({
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      maxClusterRadius: 20,
+    });
 
     this.markerGroup.addTo(this.map);
+    
     this.loadCountries();
     this.renderMarkers();
   }
 
   renderMarkers(): void {
     this.zone.runOutsideAngular(() => {
+      if (!this.markerGroup) return;
       this.markerGroup.clearLayers();
+      
       const newResults: FilteredResult[] = [];
+      const markers: L.Marker[] = [];
       const isAnyFilterActive = !!(this.selectedFilters.country || this.selectedFilters.property);
 
       DATA_LIST.forEach(partner => {
-        const allAlgae = this.partnerAlgaeCache.get(partner) ?? [];
+        // Defensive check for algae cache
+        const allAlgae = this.partnerAlgaeCache.get(partner) || [];
 
         const matchesCountry = !this.selectedFilters.country ||
           allAlgae.some(a => a.country === this.selectedFilters.country);
+        
+        // Defensive check for properties existence
         const matchesProperty = !this.selectedFilters.property ||
-          allAlgae.some(a => a.properties.includes(this.selectedFilters.property));
+          allAlgae.some(a => a.properties && a.properties.includes(this.selectedFilters.property));
 
         if (!matchesCountry || !matchesProperty) return;
 
         const marker = L.marker(partner.coords as L.LatLngExpression);
         marker.on('click', () => this.zone.run(() => this.onPinClick(partner)));
-        this.markerGroup.addLayer(marker);
+        markers.push(marker);
 
         if (isAnyFilterActive) {
           allAlgae.forEach(algae => {
             const mCountry = !this.selectedFilters.country || algae.country === this.selectedFilters.country;
-            const mProp = !this.selectedFilters.property || algae.properties.includes(this.selectedFilters.property);
+            const mProp = !this.selectedFilters.property || (algae.properties && algae.properties.includes(this.selectedFilters.property));
             if (mCountry && mProp) {
               newResults.push({ country: algae.country, type: algae.type, name: algae.name });
             }
@@ -142,13 +172,19 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
         }
       });
 
-      this.filteredResults = newResults;
-      this.cdr.markForCheck();
+      markers.forEach(m => this.markerGroup.addLayer(m));
+
+      this.zone.run(() => {
+        this.filteredResults = newResults;
+        this.cdr.markForCheck();
+      });
     });
   }
-
   resetZoom(): void {
     this.zone.runOutsideAngular(() => {
+      this.map.once('moveend', () => {
+        this.renderMarkers();
+      });
       this.map.flyToBounds(REGION_BOUNDS, { duration: 0.6 });
     });
   }
@@ -158,12 +194,14 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
       this.renderGeoJson(this.cachedGeoJson);
       return;
     }
-    fetch('assets/map.geojson')
-      .then(r => r.json())
-      .then(data => {
-        this.cachedGeoJson = data;
-        this.zone.runOutsideAngular(() => this.renderGeoJson(data));
-      });
+    this.zone.runOutsideAngular(() => {
+      fetch('assets/map.geojson')
+        .then(r => r.json())
+        .then(data => {
+          this.cachedGeoJson = data;
+          this.renderGeoJson(data);
+        });
+    });
   }
 
   private renderGeoJson(data: any): void {
@@ -176,13 +214,18 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onPinClick(popData: PopUpData): void {
-    this.popupPartner = popData as PartnerPopup;
-    this.selectedAlgaeType = '';
-    this.selectedAlgae = null;
-    this.cdr.markForCheck();
+    this.popupPartner = {
+      ...popData,
+      macroAlgae: (popData as any).macroAlgae ?? [],
+      microAlgae: (popData as any).microAlgae ?? [],
+      cyanobacteriaAlgae: (popData as any).cyanobacteriaAlgae ?? [],
+    } as PartnerPopup;
+    this.cdr.markForCheck(); 
 
     this.zone.runOutsideAngular(() => {
-      this.map.flyTo(popData.coords as L.LatLngExpression, 12, { duration: 1.5 });
+      setTimeout(() => {
+        this.map.setView(popData.coords as L.LatLngExpression, 8, { animate: true });
+      }, 50);
     });
   }
 
@@ -190,14 +233,17 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     this.popupPartner = null;
     this.selectedAlgae = null;
     this.selectedAlgaeType = '';
+    this.cdr.markForCheck();
   }
 
   selectAlgae(algae: AlgaeItem): void {
     this.selectedAlgae = algae;
+    this.cdr.markForCheck();
   }
 
   chossedAlgaeType(type: string): void {
     this.selectedAlgaeType = type;
+    this.cdr.markForCheck();
   }
 
   goBack(): void {
@@ -206,7 +252,9 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
       this.selectedAlgae = null;
     } else {
       this.closePopup();
+      return; 
     }
+    this.cdr.markForCheck();
   }
 
   applyFilter(type: 'country' | 'property', value: string): void {
@@ -221,5 +269,25 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
 
   openFilter(): void {
     this.filterOpen = !this.filterOpen;
+    this.cdr.markForCheck();
   }
+
+  // Navigation functions
+public getCurrentPartnerIndex(): number {
+  return this.sortedPartners.findIndex(p => p.name === this.popupPartner?.name);
+}
+
+public nextPartner(): void {
+  const currentIndex = this.getCurrentPartnerIndex();
+  if (currentIndex === -1) return;
+  const nextIndex = (currentIndex + 1) % this.sortedPartners.length;
+  this.onPinClick(this.sortedPartners[nextIndex]);
+}
+
+public previousPartner(): void {
+  const currentIndex = this.getCurrentPartnerIndex();
+  if (currentIndex === -1) return;
+  const prevIndex = (currentIndex - 1 + this.sortedPartners.length) % this.sortedPartners.length;
+  this.onPinClick(this.sortedPartners[prevIndex]);
+}
 }
