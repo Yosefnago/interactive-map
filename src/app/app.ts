@@ -272,22 +272,21 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  // Navigation functions
-public getCurrentPartnerIndex(): number {
-  return this.sortedPartners.findIndex(p => p.name === this.popupPartner?.name);
-}
+  public getCurrentPartnerIndex(): number {
+    return this.sortedPartners.findIndex(p => p.name === this.popupPartner?.name);
+  }
 
-public nextPartner(): void {
-  const currentIndex = this.getCurrentPartnerIndex();
-  if (currentIndex === -1) return;
-  const nextIndex = (currentIndex + 1) % this.sortedPartners.length;
-  this.onPinClick(this.sortedPartners[nextIndex]);
-}
+  public nextPartner(): void {
+    const currentIndex = this.getCurrentPartnerIndex();
+    if (currentIndex === -1) return;
+    const nextIndex = (currentIndex + 1) % this.sortedPartners.length;
+    this.onPinClick(this.sortedPartners[nextIndex]);
+  }
 
-public previousPartner(): void {
-  const currentIndex = this.getCurrentPartnerIndex();
-  if (currentIndex === -1) return;
-  const prevIndex = (currentIndex - 1 + this.sortedPartners.length) % this.sortedPartners.length;
-  this.onPinClick(this.sortedPartners[prevIndex]);
-}
+  public previousPartner(): void {
+    const currentIndex = this.getCurrentPartnerIndex();
+    if (currentIndex === -1) return;
+    const prevIndex = (currentIndex - 1 + this.sortedPartners.length) % this.sortedPartners.length;
+    this.onPinClick(this.sortedPartners[prevIndex]);
+  }
 }
