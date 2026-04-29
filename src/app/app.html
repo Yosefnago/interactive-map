@@ -4,7 +4,7 @@
   <div id="map"></div>
 
 
-  <!-- Reset Zoom Button (top-right) -->
+  <!-- Reset Zoom Button -->
   <button class="reset-zoom-btn" (click)="resetZoom()" title="Reset zoom">
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -21,6 +21,7 @@
     <span>Filter</span>
   </button>
 
+   <!-- filter menu -->
   @if (filterOpen) {
   <div class="filter-menu">
 
@@ -71,7 +72,7 @@
     
     <div class="nav-floating-info">
       <span class="nav-label">{{ popupPartner.name }}</span>
-      <span class="nav-count">{{ getCurrentPartnerIndex() + 1 }} / {{ sortedPartners.length }}</span>
+      <span class="nav-count">{{ getCurrentPartnerIndex() + 1 }} / {{ filteredPartners.length }}</span>
     </div>
 
     <button class="nav-floating-btn" (click)="nextPartner()">

@@ -42,6 +42,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   public properties: string[] = [];
   public filteredResults: FilteredResult[] = [];
   public selectedFilters = { country: '', property: '' };
+  public filteredPartners: PopUpData[] = [];
 
   constructor(private cdr: ChangeDetectorRef, private zone: NgZone) { }
 
@@ -53,6 +54,8 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     this.sortedPartners.forEach(p => {
       this.partnerAlgaeCache.set(p, [...(p.macroAlgae ?? []), ...(p.microAlgae ?? []), ...(p.cyanobacteriaAlgae ?? [])]);
     });
+
+    this.filteredPartners = [...this.sortedPartners];
     this.extractFilterOptions();
   }
 
@@ -98,6 +101,8 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private initMap(): void {
+    const customColor = '#57ADAB';
+
     this.map = L.map('map', {
       renderer: L.canvas({ tolerance: 3 }),
       minZoom: 3.5, 
@@ -110,12 +115,20 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     }).fitBounds(REGION_BOUNDS);
 
     delete (L.Icon.Default.prototype as any)._getIconUrl;
-    L.Icon.Default.mergeOptions({
-      iconUrl: 'assets/marker-icon.png',
-      iconRetinaUrl: 'assets/marker-icon-2x.png',
-      shadowUrl: 'assets/marker-shadow.png',
-    });
 
+    const myIcon = L.divIcon({
+      className: 'custom-marker', 
+      html: `<svg width="16" height="26" viewBox="0 0 25 41" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12.5 0C5.596 0 0 5.596 0 12.5C0 21.875 12.5 41 12.5 41C12.5 41 25 21.875 25 12.5C25 5.596 19.404 0 12.5 0Z" fill="${customColor}"/>
+              <circle cx="12.5" cy="12.5" r="4" fill="white"/>
+            </svg>`,
+      iconSize: [16, 26],   
+      iconAnchor: [8, 26], 
+      popupAnchor: [1, -26]
+    });
+    L.Marker.prototype.options.icon = myIcon;
+
+  
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
@@ -127,6 +140,19 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
       showCoverageOnHover: false,
       zoomToBoundsOnClick: true,
       maxClusterRadius: 20,
+      
+      iconCreateFunction: (cluster: any) => {
+        return L.divIcon({
+          className: 'custom-cluster-marker',
+          html: `<svg width="16" height="26" viewBox="0 0 25 41" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12.5 0C5.596 0 0 5.596 0 12.5C0 21.875 12.5 41 12.5 41C12.5 41 25 21.875 25 12.5C25 5.596 19.404 0 12.5 0Z" fill="${customColor}"/>
+                  <circle cx="12.5" cy="12.5" r="4" fill="white"/>
+                </svg>`,
+          iconSize: [16, 26],   
+          iconAnchor: [8, 26], 
+          popupAnchor: [1, -26]
+        });
+      }
     });
 
     this.markerGroup.addTo(this.map);
@@ -136,50 +162,55 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   }
 
   renderMarkers(): void {
-    this.zone.runOutsideAngular(() => {
-      if (!this.markerGroup) return;
-      this.markerGroup.clearLayers();
+  this.zone.runOutsideAngular(() => {
+    if (!this.markerGroup) return;
+    this.markerGroup.clearLayers();
+    
+    const newResults: FilteredResult[] = [];
+    const markers: L.Marker[] = [];
+    const currentFiltered: PopUpData[] = []; 
+    const isAnyFilterActive = !!(this.selectedFilters.country || this.selectedFilters.property);
+
+    DATA_LIST.forEach(partner => {
+      const allAlgae = this.partnerAlgaeCache.get(partner) || [];
+
+      const matchesCountry = !this.selectedFilters.country ||
+        allAlgae.some(a => a.country === this.selectedFilters.country);
       
-      const newResults: FilteredResult[] = [];
-      const markers: L.Marker[] = [];
-      const isAnyFilterActive = !!(this.selectedFilters.country || this.selectedFilters.property);
+      const matchesProperty = !this.selectedFilters.property ||
+        allAlgae.some(a => a.properties && a.properties.includes(this.selectedFilters.property));
 
-      DATA_LIST.forEach(partner => {
-        // Defensive check for algae cache
-        const allAlgae = this.partnerAlgaeCache.get(partner) || [];
+      if (!matchesCountry || !matchesProperty) return;
 
-        const matchesCountry = !this.selectedFilters.country ||
-          allAlgae.some(a => a.country === this.selectedFilters.country);
-        
-        // Defensive check for properties existence
-        const matchesProperty = !this.selectedFilters.property ||
-          allAlgae.some(a => a.properties && a.properties.includes(this.selectedFilters.property));
+      currentFiltered.push(partner);
 
-        if (!matchesCountry || !matchesProperty) return;
+      const marker = L.marker(partner.coords as L.LatLngExpression);
+      marker.on('click', () => this.zone.run(() => this.onPinClick(partner)));
+      markers.push(marker);
 
-        const marker = L.marker(partner.coords as L.LatLngExpression);
-        marker.on('click', () => this.zone.run(() => this.onPinClick(partner)));
-        markers.push(marker);
-
-        if (isAnyFilterActive) {
-          allAlgae.forEach(algae => {
-            const mCountry = !this.selectedFilters.country || algae.country === this.selectedFilters.country;
-            const mProp = !this.selectedFilters.property || (algae.properties && algae.properties.includes(this.selectedFilters.property));
-            if (mCountry && mProp) {
-              newResults.push({ country: algae.country, type: algae.type, name: algae.name });
-            }
-          });
-        }
-      });
-
-      markers.forEach(m => this.markerGroup.addLayer(m));
-
-      this.zone.run(() => {
-        this.filteredResults = newResults;
-        this.cdr.markForCheck();
-      });
+      if (isAnyFilterActive) {
+        allAlgae.forEach(algae => {
+          const mCountry = !this.selectedFilters.country || algae.country === this.selectedFilters.country;
+          const mProp = !this.selectedFilters.property || (algae.properties && algae.properties.includes(this.selectedFilters.property));
+          if (mCountry && mProp) {
+            newResults.push({ country: algae.country, type: algae.type, name: algae.name });
+          }
+        });
+      }
     });
-  }
+
+    markers.forEach(m => this.markerGroup.addLayer(m));
+
+    this.zone.run(() => {
+      this.filteredPartners = currentFiltered.sort((a, b) => 
+        (a.name || '').localeCompare(b.name || '')
+      );
+
+      this.filteredResults = newResults;
+      this.cdr.markForCheck();
+    });
+  });
+}
   resetZoom(): void {
     this.zone.runOutsideAngular(() => {
       this.map.once('moveend', () => {
@@ -208,7 +239,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     L.geoJSON(data, {
       interactive: false,
       filter: f => f.geometry.type !== 'Point',
-      style: { color: '#2fc989ff', fillColor: '#2fc989ff', weight: 1, fillOpacity: 0.6 },
+      style: { color: '#53B5A5', fillColor: '#53B5A5', weight: 1, fillOpacity: 0.2 },
       pointToLayer: (_f, latlng) => L.marker(latlng)
     }).addTo(this.map);
   }
@@ -273,20 +304,30 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public getCurrentPartnerIndex(): number {
-    return this.sortedPartners.findIndex(p => p.name === this.popupPartner?.name);
+    return this.filteredPartners.findIndex(p => p.name === this.popupPartner?.name);
   }
 
   public nextPartner(): void {
     const currentIndex = this.getCurrentPartnerIndex();
-    if (currentIndex === -1) return;
-    const nextIndex = (currentIndex + 1) % this.sortedPartners.length;
-    this.onPinClick(this.sortedPartners[nextIndex]);
+    if (currentIndex === -1 || this.filteredPartners.length === 0) return;
+
+    const nextIndex = (currentIndex + 1) % this.filteredPartners.length;
+    
+    this.selectedAlgae = null;
+    this.selectedAlgaeType = '';
+    
+    this.onPinClick(this.filteredPartners[nextIndex]);
   }
 
   public previousPartner(): void {
     const currentIndex = this.getCurrentPartnerIndex();
-    if (currentIndex === -1) return;
-    const prevIndex = (currentIndex - 1 + this.sortedPartners.length) % this.sortedPartners.length;
-    this.onPinClick(this.sortedPartners[prevIndex]);
+    if (currentIndex === -1 || this.filteredPartners.length === 0) return;
+
+    const prevIndex = (currentIndex - 1 + this.filteredPartners.length) % this.filteredPartners.length;
+    
+    this.selectedAlgae = null;
+    this.selectedAlgaeType = '';
+
+    this.onPinClick(this.filteredPartners[prevIndex]);
   }
 }

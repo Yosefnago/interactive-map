@@ -232,16 +232,16 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  background: #1a332a;
+  background: #366D6C;
   padding: 12px 20px;
   border-radius: 50px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.3);
   z-index: 4000;
-  border: 1px solid #2fc989ff;
+  border: 1px solid rgb(163, 208, 176);
 }
 
 .nav-floating-btn {
-  background: #2fc989ff;
+  background: #274F4E;
   color: white;
   border: none;
   border-radius: 50%;
@@ -263,16 +263,16 @@
 }
 
 .nav-label { 
-  font-size: 0.8rem; 
-  font-weight: 600; 
-  color: #2fc989ff; 
+  font-size: 0.9rem; 
+  font-weight: 500; 
+  color: #ffffff; 
   max-width: 150px;
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
+  
 }
 
-.nav-count { font-weight: bold; font-size: 0.9rem; }
+.nav-count { font-weight: 400; font-size: 0.9rem; }
 .no-data-msg {
   font-size: 13px;
   color: rgba(232, 240, 255, 0.4);
@@ -327,24 +327,24 @@
 
 .partner-popup,
 .algaeSide {
-  background: rgba(18, 43, 27, 0.85);
+  background: #366D6C;
   border: 1px solid rgba(136, 212, 158, 0.15);
 }
 
 .popup-type-badge {
-  color: #88d49e;
+  color: #ffffff;
   background: rgba(136, 212, 158, 0.15);
   border-color: rgba(136, 212, 158, 0.3);
 }
 
 .algaeSide-btn:hover {
-  background: rgba(30, 77, 43, 0.6);
+  background: #366D6C;
   border-color: rgba(136, 212, 158, 0.4);
 }
 
 .algaeSide-btn.selected {
-  background: rgba(46, 125, 66, 0.8);
-  border-color: #88d49e;
+  background: #18302F;
+  
   color: #ffffff;
 }
 
@@ -495,7 +495,7 @@
 
 .popup-scientific {
   font-size: 14px;
-  color: var(--color-light-gray);
+  color: #fff;
   font-style: italic;
   font-family: var(--font-primary);
 }
@@ -507,9 +507,9 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: rgba(18, 43, 27, 0.95);
+  background: #366D6C;
   border: 1px solid rgba(136, 212, 158, 0.25);
-  color: var(--color-light-gray);
+  color: #fff;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -521,8 +521,8 @@
 
 .popup-close-corner:hover {
   color: #fff;
-  transform: scale(1.1);
-  background: rgba(46, 125, 66, 0.9);
+  background: #366D6C;
+  border-color: rgba(136, 212, 158, 0.4);
 }
 
 /* Content */
@@ -543,7 +543,7 @@
   font-family: var(--font-primary);
   font-weight: 500;
   background: rgba(136, 212, 158, 0.15);
-  color: #88d49e;
+  color: #fff;
   border: 1px solid rgba(136, 212, 158, 0.3);
 }
 
@@ -583,7 +583,7 @@
   font-size: 12px;
   font-weight: 600;
   background: rgba(136, 212, 158, 0.15);
-  color: #88d49e;
+  color: #fff;
   border: 1px solid rgba(136, 212, 158, 0.3);
   gap: 10px;
 }
