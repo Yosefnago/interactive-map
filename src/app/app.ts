@@ -3,7 +3,7 @@ import {
   HostListener, ChangeDetectorRef, NgZone, ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DATA_LIST, PopUpData, MacroAlgaeInfo, MicroAlgaeInfo, CyanobacteriaInfo } from './app.data';
+import { DATA_LIST, PopUpData, MacroAlgaeInfo, MicroAlgaeInfo, CyanobacteriaInfo, apiKey } from './app.data';
 import * as L from 'leaflet';
 
 
@@ -105,10 +105,12 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
 
     this.map = L.map('map', {
       renderer: L.canvas({ tolerance: 3 }),
-      minZoom: 3.5, 
+      minZoom: 4, 
       maxZoom: 8,
       zoomDelta: 1,
-      zoomSnap: 0,
+      zoomSnap: 1,
+      wheelDebounceTime: 250, 
+      wheelPxPerZoomLevel: 120, 
       zoomControl: false,
       maxBounds: REGION_BOUNDS,
       maxBoundsViscosity: 1.0,
@@ -129,11 +131,17 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     L.Marker.prototype.options.icon = myIcon;
 
   
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const mapboxToken = 'pk.eyJ1IjoieW9zaW5hZ28iLCJhIjoiY21vcmM4a3RyMjJzbTJxcjJvbno3aGpjdCJ9.kEUJCuhX5txw-CVgOS1Dow';
+
+    L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/{z}/{x}/{y}?access_token=${mapboxToken}`, {
+      tileSize: 512,
+      zoomOffset: -1,
       maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
-      crossOrigin: true
-    }).addTo(this.map);
+      updateWhenIdle: true,
+      keepBuffer: 2,
+      crossOrigin: true,
+      attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(this.map);
     
     this.markerGroup = (window as any).L.markerClusterGroup({
       spiderfyOnMaxZoom: true,
