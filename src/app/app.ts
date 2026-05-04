@@ -3,7 +3,7 @@ import {
   HostListener, ChangeDetectorRef, NgZone, ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DATA_LIST, PopUpData, MacroAlgaeInfo, MicroAlgaeInfo, CyanobacteriaInfo, apiKey } from './app.data';
+import { DATA_LIST, PopUpData, MacroAlgaeInfo, MicroAlgaeInfo, CyanobacteriaInfo } from './app.data';
 import * as L from 'leaflet';
 
 
@@ -131,9 +131,9 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     L.Marker.prototype.options.icon = myIcon;
 
   
-    const mapboxToken = 'pk.eyJ1IjoieW9zaW5hZ28iLCJhIjoiY21vcmM4a3RyMjJzbTJxcjJvbno3aGpjdCJ9.kEUJCuhX5txw-CVgOS1Dow';
+    const mp = 'pk.eyJ1IjoieW9zaW5hZ28iLCJhIjoiY21vcmhmYmxkMXI0eDJzczRtZDQ0MTFoNCJ9.5UmsBnRDr1YKEV7raoq0Jw';
 
-    L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/{z}/{x}/{y}?access_token=${mapboxToken}`, {
+    L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/{z}/{x}/{y}?access_token=${mp}`, {
       tileSize: 512,
       zoomOffset: -1,
       maxZoom: 19,
