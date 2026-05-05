@@ -40,8 +40,9 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   public filterOpen = false;
   public countries: string[] = [];
   public properties: string[] = [];
+  public types: string[] = [];
   public filteredResults: FilteredResult[] = [];
-  public selectedFilters = { country: '', property: '' };
+  public selectedFilters = { country: '', property: '', type: '' };
   public filteredPartners: PopUpData[] = [];
 
   constructor(private cdr: ChangeDetectorRef, private zone: NgZone) { }
@@ -87,17 +88,20 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   private extractFilterOptions(): void {
     const countrySet = new Set<string>();
     const propertySet = new Set<string>();
+    const typeSet = new Set<string>();
 
     DATA_LIST.forEach(p => {
       const allAlgae = this.partnerAlgaeCache.get(p) ?? [];
       allAlgae.forEach(a => {
         if (a.country) countrySet.add(a.country);
         a.properties?.forEach(prop => propertySet.add(prop));
+        if (a.type) typeSet.add(a.type);
       });
     });
 
     this.countries = Array.from(countrySet).sort();
     this.properties = Array.from(propertySet).sort();
+    this.types = Array.from(typeSet).sort();
   }
 
   private initMap(): void {
@@ -105,14 +109,11 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
 
     this.map = L.map('map', {
       renderer: L.canvas({ tolerance: 3 }),
-      minZoom: 4, 
+      minZoom: 3,
       maxZoom: 8,
-      zoomDelta: 1,
-      zoomSnap: 1,
       wheelDebounceTime: 250, 
       wheelPxPerZoomLevel: 120, 
       zoomControl: false,
-      maxBounds: REGION_BOUNDS,
       maxBoundsViscosity: 1.0,
     }).fitBounds(REGION_BOUNDS);
 
@@ -131,17 +132,17 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     L.Marker.prototype.options.icon = myIcon;
 
   
-    const mp = 'pk.eyJ1IjoieW9zaW5hZ28iLCJhIjoiY21vcmhmYmxkMXI0eDJzczRtZDQ0MTFoNCJ9.5UmsBnRDr1YKEV7raoq0Jw';
-
-    L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/{z}/{x}/{y}?access_token=${mp}`, {
-      tileSize: 512,
-      zoomOffset: -1,
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      updateWhenIdle: true,
-      keepBuffer: 2,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
       crossOrigin: true,
-      attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-  }).addTo(this.map);
+      updateWhenIdle: true,
+      keepBuffer:1,
+      detectRetina: false,
+      updateWhenZooming: false,
+      updateInterval: 250,
+      noWrap: true
+    }).addTo(this.map);
     
     this.markerGroup = (window as any).L.markerClusterGroup({
       spiderfyOnMaxZoom: true,
@@ -177,7 +178,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     const newResults: FilteredResult[] = [];
     const markers: L.Marker[] = [];
     const currentFiltered: PopUpData[] = []; 
-    const isAnyFilterActive = !!(this.selectedFilters.country || this.selectedFilters.property);
+    const isAnyFilterActive = !!(this.selectedFilters.country || this.selectedFilters.property || this.selectedFilters.type);
 
     DATA_LIST.forEach(partner => {
       const allAlgae = this.partnerAlgaeCache.get(partner) || [];
@@ -188,7 +189,10 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
       const matchesProperty = !this.selectedFilters.property ||
         allAlgae.some(a => a.properties && a.properties.includes(this.selectedFilters.property));
 
-      if (!matchesCountry || !matchesProperty) return;
+      const matchesType = !this.selectedFilters.type ||
+        allAlgae.some(a => a.type === this.selectedFilters.type);
+
+      if (!matchesCountry || !matchesProperty || !matchesType) return;
 
       currentFiltered.push(partner);
 
@@ -200,7 +204,8 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
         allAlgae.forEach(algae => {
           const mCountry = !this.selectedFilters.country || algae.country === this.selectedFilters.country;
           const mProp = !this.selectedFilters.property || (algae.properties && algae.properties.includes(this.selectedFilters.property));
-          if (mCountry && mProp) {
+          const mType = !this.selectedFilters.type || algae.type === this.selectedFilters.type;
+          if (mCountry && mProp && mType) {
             newResults.push({ country: algae.country, type: algae.type, name: algae.name });
           }
         });
@@ -296,13 +301,13 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  applyFilter(type: 'country' | 'property', value: string): void {
+  applyFilter(type: 'country' | 'property' | 'type', value: string,): void {
     this.selectedFilters[type] = value;
     this.renderMarkers();
   }
 
   clearFilters(): void {
-    this.selectedFilters = { country: '', property: '' };
+    this.selectedFilters = { country: '', property: '', type: '' };
     this.renderMarkers();
   }
 

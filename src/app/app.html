@@ -43,9 +43,18 @@
       </select>
     </div>
 
+    <div class="filter-section">
+      <label>Filter by Type:</label>
+      <select (change)="applyFilter('type', $any($event.target).value)" [value]="selectedFilters.type">
+        <option value="" disabled selected>Select Type</option> @for (t of types; track t) {
+        <option [value]="t">{{t}}</option>
+        }
+      </select>
+    </div>
+
     <button class="clear-btn" (click)="clearFilters()">Clear All</button>
 
-    @if ((selectedFilters.country || selectedFilters.property) && filteredResults.length > 0) {
+    @if ((selectedFilters.country || selectedFilters.property || selectedFilters.type) && filteredResults.length > 0) {
     <div class="results-container">
       <div class="results-header">Matches ({{filteredResults.length}}):</div>
       <div class="results-list">
