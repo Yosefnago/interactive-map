@@ -1,58 +1,211 @@
 <div class="map-wrapper" #mapWrapper>
 
-  <!-- Leaflet Map -->
-  <div id="map"></div>
+  <div class="top-controls" [class.table-mode]="isTableView">
+  
+    <button class="accessibility-btn" (click)="toggleView()" tabindex="1">
+      <span>{{ isTableView ? 'Return to Map' : 'Accessibility Table View' }}</span>
+    </button>
 
+    <button  type="submit" 
+            class="filter-btn" 
+            [class.filter-table-style]="isTableView" 
+            (click)="openFilter()">
+        Filter
+    </button>
 
-  <!-- Reset Zoom Button -->
-  <button class="reset-zoom-btn" (click)="resetZoom()" title="Reset zoom">
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-      <path d="M3 3v5h5" />
-    </svg>
-    <span>Reset View</span>
-  </button>
-  <button type="submit" class="filter-btn" (click)="openFilter()">
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-    </svg>
-    <span>Filter</span>
-  </button>
+  </div>
+  <div id="map" [hidden]="isTableView"></div>
+
+  @if (isTableView) {
+  <div class="accessibility-table-container">
+    <table class="accessibility-table">
+      <thead>
+        <tr>
+          <th (click)="sortData('name')" (keydown.enter)="sortData('name')" tabindex="2" class="sortable-header">
+            <div class="header-content">
+              Partner 
+              <span class="sort-icon">
+                @if (sortKey === 'name') {
+                  @if (sortDirection === 'asc') {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+                  } @else {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                  }
+                } @else {
+                  <svg class="neutral" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg>
+                }
+              </span>
+            </div>
+          </th>
+
+          <th (click)="sortData('country')" (keydown.enter)="sortData('country')" tabindex="3" class="sortable-header">
+            <div class="header-content">
+              Country
+              <span class="sort-icon">
+                @if (sortKey === 'country') {
+                  @if (sortDirection === 'asc') {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+                  } @else {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                  }
+                } @else {
+                  <svg class="neutral" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg>
+                }
+              </span>
+            </div>
+          </th>
+          <th>Algae Types</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+        <tbody>
+          @for (partner of filteredPartners; track partner.name) {
+            <tr tabindex="5" class="main-row" (click)="toggleRow(partner.name)"  [class.expanded]="expandedRows.has(partner.name)">
+              <td><strong>{{ partner.name }}</strong></td>
+              <td>{{ partner.country }}</td>
+              <td>
+              <div class="type-badges">
+                @if (partner.macroAlgae?.length) { <span class="badge macro">Macro</span> }
+                @if (partner.microAlgae?.length) { <span class="badge micro">Micro</span> }
+                @if (partner.cyanobacteriaAlgae?.length) { <span class="badge cyano">Cyano</span> }
+              </div>
+            </td>
+              <td>
+                <button class="expand-btn">
+                  <span>{{ expandedRows.has(partner.name) ? 'Hide Species' : 'View Species' }}</span>
+                  <svg 
+                    [style.transform]="expandedRows.has(partner.name) ? 'rotate(180deg)' : 'rotate(0)'"
+                    style="transition: transform 0.3s ease"
+                    xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m6 9 6 6 6-6"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+
+            @if (expandedRows.has(partner.name)) {
+            <tr class="details-row">
+              <td colspan="4">
+                <div class="details-content">
+                  
+                  @if (partner.macroAlgae?.length) {
+                    <div class="algae-group">
+                      <span class="label macro">Macro Algae:</span>
+                      <div class="species-container">
+                        @for (algae of partner.macroAlgae; track algae.name) {
+                          <div class="algae-item">
+                            <span class="algae-name">{{ algae.name }}:</span>
+                            <div class="property-chips">
+                              @for (prop of algae.properties; track prop) {
+                                <span class="prop-chip">{{ prop }}</span>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  @if (partner.microAlgae?.length) {
+                    <div class="algae-group">
+                      <span class="label micro">Micro Algae:</span>
+                      <div class="species-container">
+                        @for (algae of partner.microAlgae; track algae.name) {
+                          <div class="algae-item">
+                            <span class="algae-name">{{ algae.name }}:</span>
+                            <div class="property-chips">
+                              @for (prop of algae.properties; track prop) {
+                                <span class="prop-chip">{{ prop }}</span>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  @if (partner.cyanobacteriaAlgae?.length) {
+                    <div class="algae-group">
+                      <span class="label cyano">Cyanobacteria:</span>
+                      <div class="species-container">
+                        @for (algae of partner.cyanobacteriaAlgae; track algae.name) {
+                          <div class="algae-item">
+                            <span class="algae-name">{{ algae.name }}:</span>
+                            <div class="property-chips">
+                              @for (prop of algae.properties; track prop) {
+                                <span class="prop-chip">{{ prop }}</span>
+                              }
+
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                </div>
+              </td>
+            </tr>
+          }
+          }
+        </tbody>
+      </table></div>
+  }
+
+  @if (!isTableView) {
+    <button class="reset-zoom-btn" (click)="resetZoom()" title="Reset zoom" tabindex="6">
+      <span>Reset View</span>
+    </button>
+
+    <button type="submit" class="filter-btn" (click)="openFilter()" tabindex="7">
+      <span>Filter</span>
+    </button>
+  }
 
    <!-- filter menu -->
   @if (filterOpen) {
-  <div class="filter-menu">
+  <div class="filter-menu" [class.table-mode]="isTableView">
 
     <div class="filter-section">
       <label>Filter by Country:</label>
-      <select (change)="applyFilter('country', $any($event.target).value)" [value]="selectedFilters.country">
-        <option value="" disabled selected>Select Country</option> @for (c of countries; track c) {
-        <option [value]="c">{{c}}</option>
+      <select tabindex="9" 
+              (keydown)="applyFilter('country', $any($event.target).value)" 
+              (change)="applyFilter('country', $any($event.target).value)" 
+              [value]="selectedFilters.country">
+        <option value="" disabled selected>Select Country</option> 
+        @for (c of countries; track c) {
+          <option [value]="c">{{c}}</option>
         }
       </select>
     </div>
 
     <div class="filter-section">
       <label>Filter by Property:</label>
-      <select (change)="applyFilter('property', $any($event.target).value)" [value]="selectedFilters.property">
-        <option value="" disabled selected>Select Property</option> @for (p of properties; track p) {
-        <option [value]="p">{{p}}</option>
+      <select tabindex="11" 
+              (keydown)="applyFilter('property', $any($event.target).value)" 
+              (change)="applyFilter('property', $any($event.target).value)" 
+              [value]="selectedFilters.property">
+        <option value="" disabled selected>Select Property</option> 
+        @for (p of properties; track p) {
+          <option [value]="p">{{p}}</option>
         }
-      </select>
-    </div>
+      </select>                                    
+    </div>      
 
     <div class="filter-section">
       <label>Filter by Type:</label>
-      <select (change)="applyFilter('type', $any($event.target).value)" [value]="selectedFilters.type">
-        <option value="" disabled selected>Select Type</option> @for (t of types; track t) {
-        <option [value]="t">{{t}}</option>
+      <select tabindex="13" 
+              (keydown)="applyFilter('type', $any($event.target).value)" 
+              (change)="applyFilter('type', $any($event.target).value)" 
+              [value]="selectedFilters.type">
+        <option value="" disabled selected>Select Type</option> 
+        @for (t of types; track t) {
+          <option [value]="t">{{t}}</option>
         }
       </select>
     </div>
 
-    <button class="clear-btn" (click)="clearFilters()">Clear All</button>
+    <button class="clear-btn" (click)="clearFilters()" tabindex="14">Clear All</button>
 
     @if ((selectedFilters.country || selectedFilters.property || selectedFilters.type) && filteredResults.length > 0) {
     <div class="results-container">
@@ -110,8 +263,12 @@
           </div>
           <img src="assets/logos/algae4IBD.png" alt="{{ selectedAlgae.name }}" class="popup-logo">
         </div>
-        <div class="popup-badges-container">
+        <div class="popup-partner-list">
+          <div class="popup-type-country-list">{{ popupPartner.name}}</div>
           <div class="popup-type-country">{{ selectedAlgae.country }}</div>
+        </div>
+        
+        <div class="popup-badges-container">
           <div class="popup-type-badge">{{ selectedAlgae.type }}</div>
         </div>
         <ul class="popup-properties">
@@ -139,13 +296,13 @@
           <span class="no-data-msg">No algae data available</span>
         } @else {
           @if (popupPartner.macroAlgae.length > 0) {
-            <button class="algaeSide-btn" (click)="chossedAlgaeType('macro')">Macro Algae</button>
+            <button class="algaeSide-btn" (click)="chossedAlgaeType('macro')" >Macro Algae</button>
           }
           @if (popupPartner.microAlgae.length > 0) {
-            <button class="algaeSide-btn" (click)="chossedAlgaeType('micro')">Micro Algae</button>
+            <button class="algaeSide-btn" (click)="chossedAlgaeType('micro')" >Micro Algae</button>
           }
           @if (popupPartner.cyanobacteriaAlgae.length > 0) {
-            <button class="algaeSide-btn" (click)="chossedAlgaeType('cyanobacteria')">Cyanobacteria</button>
+            <button class="algaeSide-btn" (click)="chossedAlgaeType('cyanobacteria')" >Cyanobacteria</button>
           }
         }
       }
@@ -167,7 +324,7 @@
         }
         @if (selectedAlgaeType === 'cyanobacteria') {
         @for (item of popupPartner.cyanobacteriaAlgae; track $index) {
-        <button class="algaeSide-btn" [class.selected]="selectedAlgae === item" (click)="selectAlgae(item)">
+        <button class="algaeSide-btn" [class.selected]="selectedAlgae === item" (click)="selectAlgae(item)" >
           {{item.name}}
         </button>
         }
@@ -178,8 +335,14 @@
   </div>
   }
   <footer class="footer">
+  <div class="footer-links">
     Developed by
     <a href="https://github.com/Yosefnago" target="_blank" rel="noopener noreferrer">
       @Yosef Nago
     </a>
-  </footer>
+    <span class="footer-divider">|</span>
+    <a href="assets/accessibility.html" target="_blank" class="footer-access-link">
+      Accessibility Statement
+    </a>
+  </div>
+</footer>

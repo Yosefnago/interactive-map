@@ -44,6 +44,10 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   public filteredResults: FilteredResult[] = [];
   public selectedFilters = { country: '', property: '', type: '' };
   public filteredPartners: PopUpData[] = [];
+  isTableView = false;
+  expandedRows = new Set<string>();
+  sortKey: string = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   constructor(private cdr: ChangeDetectorRef, private zone: NgZone) { }
 
@@ -342,5 +346,52 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     this.selectedAlgaeType = '';
 
     this.onPinClick(this.filteredPartners[prevIndex]);
+  }
+  toggleView() {
+    this.isTableView = !this.isTableView;
+    
+    if (!this.isTableView) {
+     
+      setTimeout(() => {
+        this.map.invalidateSize();
+      }, 50);
+    }
+  }
+  toggleRow(partnerName: string) {
+    if (this.expandedRows.has(partnerName)) {
+      this.expandedRows.delete(partnerName);
+    } else {
+      this.expandedRows.add(partnerName);
+    }
+  }
+ 
+  getSpeciesNames(algaeList: any[] | undefined): string {
+    if (!algaeList || algaeList.length === 0) {
+      return '';
+    }
+    return algaeList.map(algae => algae.name).join(', ');
+  }
+  sortData(key: string): void {
+    if (this.sortKey === key) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortKey = key;
+      this.sortDirection = 'asc';
+    }
+
+    this.filteredPartners.sort((a: any, b: any) => {
+      const valA = (a[key] || '').toString().toLowerCase();
+      const valB = (b[key] || '').toString().toLowerCase();
+
+      if (valA < valB) {
+        return this.sortDirection === 'asc' ? -1 : 1;
+      }
+      if (valA > valB) {
+        return this.sortDirection === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+
+    this.filteredPartners = [...this.filteredPartners];
   }
 }
