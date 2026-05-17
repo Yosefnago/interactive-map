@@ -136,9 +136,9 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     L.Marker.prototype.options.icon = myIcon;
 
   
-    L.tileLayer('https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '© OpenStreetMap contributors © Stadia Maps',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
       crossOrigin: true,
       updateWhenIdle: true,
       keepBuffer:1,
