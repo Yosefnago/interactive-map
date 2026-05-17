@@ -109,7 +109,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private initMap(): void {
-    const customColor = '#57ADAB';
+    const customColor = '#004b92';
 
     this.map = L.map('map', {
       renderer: L.canvas({ tolerance: 3 }),
@@ -256,7 +256,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     L.geoJSON(data, {
       interactive: false,
       filter: f => f.geometry.type !== 'Point',
-      style: { color: '#53B5A5', fillColor: '#53B5A5', weight: 1, fillOpacity: 0.2 },
+      style: { color: '#004b92', fillColor: '#004b92', weight: 1, fillOpacity: 0.6 },
       pointToLayer: (_f, latlng) => L.marker(latlng)
     }).addTo(this.map);
   }
