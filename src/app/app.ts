@@ -321,7 +321,11 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public getCurrentPartnerIndex(): number {
-    return this.filteredPartners.findIndex(p => p.name === this.popupPartner?.name);
+    if (!this.popupPartner) return -1;
+    return this.filteredPartners.findIndex(p => 
+      p.name === this.popupPartner?.name && 
+      JSON.stringify(p.coords) === JSON.stringify(this.popupPartner?.coords)
+    );
   }
 
   public nextPartner(): void {
@@ -394,4 +398,5 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
 
     this.filteredPartners = [...this.filteredPartners];
   }
+  
 }

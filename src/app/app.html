@@ -233,7 +233,13 @@
     </button>
     
     <div class="nav-floating-info">
-      <span class="nav-label">{{ popupPartner.name }}</span>
+      <span class="nav-label">
+        @if (popupPartner.name.toLowerCase().includes('gopsis')) {
+          GOPSIS {{ popupPartner.country.toUpperCase() }}
+        } @else {
+          {{ popupPartner.name.toUpperCase() }}
+        }
+      </span>
       <span class="nav-count">{{ getCurrentPartnerIndex() + 1 }} / {{ filteredPartners.length }}</span>
     </div>
 
@@ -260,6 +266,9 @@
         <div class="popup-header">
           <div class="popup-header-text">
             <em class="popup-algae-name">{{ selectedAlgae.name }}</em>
+            @if (selectedAlgae.collectedFrom != '') {
+              <span class="popup-algae-header-text">Collected from: {{ selectedAlgae.collectedFrom }}</span>
+            }
           </div>
           <img src="assets/logos/algae4IBD.png" alt="{{ selectedAlgae.name }}" class="popup-logo">
         </div>
