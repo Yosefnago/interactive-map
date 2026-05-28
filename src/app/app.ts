@@ -277,6 +277,10 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     });
   }
   onFilteredClick(res: FilteredResult) {
+    if (this.isTableView) {
+      return;
+    }
+    
     const fullPartnerData = DATA_LIST.find(p => 
       p.name === res.partner && p.country === res.country
     );
