@@ -212,8 +212,9 @@
       <div class="results-header">Matches ({{filteredResults.length}}):</div>
       <div class="results-list">
         @for (res of filteredResults; track $index) {
-        <div class="result-item">
+        <div class="result-item" (click)="onFilteredClick(res)" style="cursor: pointer;">
           <span class="res-country">{{res.country}}</span>,
+          <span class="res-partner">{{res.partner}}</span>,
           <span class="res-type">{{res.type}}</span>,
           <span class="res-name">{{res.name}}</span>
         </div>

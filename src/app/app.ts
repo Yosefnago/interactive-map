@@ -10,7 +10,7 @@ import * as L from 'leaflet';
 const REGION_BOUNDS: L.LatLngBoundsExpression = [[0, -20], [75, 100]];
 
 type AlgaeItem = MacroAlgaeInfo | MicroAlgaeInfo;
-type FilteredResult = { country: string; type: string; name: string };
+type FilteredResult = { country: string;partner:string, type: string; name: string };
 type PartnerPopup = PopUpData & { 
   macroAlgae: MacroAlgaeInfo[]; 
   microAlgae: MicroAlgaeInfo[]; 
@@ -210,7 +210,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
           const mProp = !this.selectedFilters.property || (algae.properties && algae.properties.includes(this.selectedFilters.property));
           const mType = !this.selectedFilters.type || algae.type === this.selectedFilters.type;
           if (mCountry && mProp && mType) {
-            newResults.push({ country: algae.country, type: algae.type, name: algae.name });
+            newResults.push({ country: algae.country,partner:partner.name, type: algae.type, name: algae.name });
           }
         });
       }
@@ -275,6 +275,35 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
         this.map.setView(popData.coords as L.LatLngExpression, 8, { animate: true });
       }, 50);
     });
+  }
+  onFilteredClick(res: FilteredResult) {
+    const fullPartnerData = DATA_LIST.find(p => 
+      p.name === res.partner && p.country === res.country
+    );
+
+    if (fullPartnerData) {
+      this.onPinClick(fullPartnerData);
+
+      let targetAlgae: AlgaeItem | undefined;
+      let targetType: string | undefined;
+
+      if (res.type === 'MacroAlgae') {
+        targetAlgae = fullPartnerData.macroAlgae?.find(a => a.name === res.name);
+        targetType = 'macro';
+      } else if (res.type === 'MicroAlgae') {
+        targetAlgae = fullPartnerData.microAlgae?.find(a => a.name === res.name);
+        targetType = 'micro';
+      } else if (res.type === 'Cyanobacteria') {
+        targetAlgae = fullPartnerData.cyanobacteriaAlgae?.find(a => a.name === res.name);
+        targetType = 'cyanobacteria';
+      }
+
+      if (targetAlgae && targetType) {
+        this.selectedAlgaeType = targetType;
+        this.selectedAlgae = targetAlgae;
+        this.cdr.markForCheck();
+      }
+    } 
   }
 
   closePopup(): void {
