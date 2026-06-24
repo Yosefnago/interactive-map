@@ -256,7 +256,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     L.geoJSON(data, {
       interactive: false,
       filter: f => f.geometry.type !== 'Point',
-      style: { color: '#004b92', fillColor: '#004b92', weight: 1, fillOpacity: 0.6 },
+      style: { color: '#004b92', fillColor: '#004b92', weight: 2, fillOpacity: 0.1 },
       pointToLayer: (_f, latlng) => L.marker(latlng)
     }).addTo(this.map);
   }
