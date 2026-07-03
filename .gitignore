@@ -49,3 +49,4 @@ src/assets/logos
 src/environments/environment.development.ts
 src/assets/styles/variables.css
 src/assets/privacy.html
+src/assets/accessibility.html
