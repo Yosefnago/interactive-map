@@ -48,3 +48,4 @@ src/assets/logos
 # Local Environments
 src/environments/environment.development.ts
 src/assets/styles/variables.css
+src/assets/privacy.html
