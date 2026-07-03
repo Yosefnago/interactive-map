@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Algae4IBD</title>
+    <style>
+        :root {
+            --primary-color: #004b92;
+            --text-color: #1a1a1a;
+            --bg-color: #ffffff;
+            --card-bg: #f8f9fa;
+            --border-color: #eaeaea;
+        }
+
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        .lang-nav {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        html[dir="rtl"] .lang-nav {
+            justify-content: flex-start;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 6px 14px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .lang-btn[aria-pressed="true"] {
+            background: var(--primary-color);
+            color: #ffffff;
+        }
+
+        .lang-btn:focus-visible, a:focus-visible {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        h1 {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-top: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        ul {
+            padding-inline-start: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .contact-info {
+            background: var(--card-bg);
+            border-inline-start: 4px solid var(--primary-color);
+            padding: 15px;
+            margin-top: 30px;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="lang-nav" aria-label="Language selection">
+            <button type="button" id="btn-en" class="lang-btn" aria-pressed="true" onclick="setLang('en')">English</button>
+            <button type="button" id="btn-he" class="lang-btn" aria-pressed="false" onclick="setLang('he')">עברית</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- English Content -->
+        <section id="en-content">
+            <h1>Privacy Policy</h1>
+            <p><strong>Last Updated:</strong> July 2026</p>
+            
+            <p>This Privacy Policy describes how data is collected, used, and processed when you access and interact with the Algae4IBD interactive mapping application. We are committed to protecting your privacy and processing data in strict compliance with the European General Data Protection Regulation (GDPR) and the Israeli Privacy Protection Law (1981).</p>
+
+            <h2>1. Data Collection & Third-Party Services</h2>
+            <p>This application operates as a client-side web interface. We do not maintain a backend server or database that registers, collects, or stores Personally Identifiable Information (PII) such as names, phone numbers, or personal addresses. However, technical data is exchanged with necessary third-party services:</p>
+            <ul>
+                <li><strong>OpenStreetMap (Mapping Tiles):</strong> To render the interactive map, geographical map tiles are fetched dynamically from OpenStreetMap servers (<code>tile.openstreetmap.org</code>). When loading these tiles, your browser automatically transmits technical data, including your IP address and User-Agent, directly to the OpenStreetMap Foundation.</li>
+                <li><strong>Google Analytics 4:</strong> We embed Google Analytics (Property ID: <code>G-QGVFFD89J1</code>) to understand website traffic, aggregate user interaction patterns, and optimize the application. Google Analytics uses cookies to collect anonymous usage metrics (pages viewed, session duration, device type, browser type, and general geographic region). IP addresses are anonymized by Google by default.</li>
+            </ul>
+
+            <h2>2. Legal Basis for Processing (GDPR)</h2>
+            <ul>
+                <li><strong>Technical Operation (OpenStreetMap):</strong> The transmission of IP addresses to map tile providers is strictly necessary for the rendering of the application and is based on our <em>Legitimate Interest</em> in displaying research project data.</li>
+                <li><strong>Analytics (Google Analytics):</strong> The processing of analytical metrics via cookies relies on user consent. You may disable or block cookies at any time via your browser settings without affecting the core functionality of the mapping tool.</li>
+            </ul>
+
+            <h2>3. Data Security & Retention</h2>
+            <p>Aggregated analytical data processed by Google Analytics is stored securely on Google servers under international data security standards (ISO 27001, SOC 2). Since the application itself collects no direct user data locally, there are no local databases susceptible to PII breaches.</p>
+
+            <h2>4. User Rights</h2>
+            <p>Under applicable data protection laws, you retain the right to:</p>
+            <ul>
+                <li><strong>Access and Review:</strong> Request information regarding any personal data processed through our third-party integrations.</li>
+                <li><strong>Opt-Out and Deletion:</strong> Clear cookies from your browser or utilize opt-out extensions (such as the Google Analytics Opt-out Browser Add-on) to prevent analytical tracking.</li>
+            </ul>
+
+            <h2>5. Contact Information</h2>
+            <p>For any questions, concerns, or inquiries regarding this Privacy Policy or data management within the Algae4IBD project, please contact:</p>
+            
+            <div class="contact-info">
+                <p><strong>Contact Person:</strong> Yosef Nago</p>
+                <p><strong>Email:</strong> <a href="mailto:yosinago5@gmail.com">yosinago5@gmail.com</a></p>
+            </div>
+        </section>
+
+        <!-- Hebrew Content -->
+        <section id="he-content" hidden>
+            <h1>מדיניות פרטיות</h1>
+            <p><strong>תאריך עדכון אחרון:</strong> יולי 2026</p>
+            
+            <p>מדיניות פרטיות זו מפרטת את אופן איסוף ועיבוד המידע בעת השימוש באפליקציית המפות האינטראקטיבית של פרויקט Algae4IBD. אנו מחוייבים להגנה על פרטיות המשתמשים ולעיבוד נתונים בהתאם לרגולציית הגנת המידע האירופית (GDPR) ולחוק הגנת הפרטיות, התשמ"א-1981 בישראל.</p>
+
+            <h2>1. איסוף מידע ושימוש בשירותי צד שלישי</h2>
+            <p>מערכת זו פועלת כיישום צד-לקוח (Client-side). האתר אינו מפעיל מסד נתונים אחורי ואינו אוסף, רושם או שומר מידע אישי מזהה (PII) כגון שמות, מספרי טלפון או כתובות דוא"ל. עם זאת, לצורך תפקוד האתר מועבר מידע טכני לשירותים הבאים:</p>
+            <ul>
+                <li><strong>שירותי מפה (OpenStreetMap):</strong> לצורך הצגת המפה האינטראקטיבית, אריחי המפה נטענים ישירות משרתי OpenStreetMap (בכתובת <code>tile.openstreetmap.org</code>). בעת טעינת המפה, הדפדפן שלך משדר באופן אוטומטי נתונים טכניים, לרבות כתובת ה-IP ומזהה הדפדפן (User-Agent), ישירות לשרתי OpenStreetMap Foundation.</li>
+                <li><strong>ניתוח תעבורה (Google Analytics 4):</strong> האתר עושה שימוש בכלי Google Analytics (מזהה: <code>G-QGVFFD89J1</code>) לצורך ניתוח סטטיסטי מצרפי של תנועת המשתמשים ושיפור חוויית השימוש. השירות משתמש בקובצי עוגיות (Cookies) לאיסוף מידע אנונימי (עמודים נצפים, משך גלישה, סוג מכשיר ודפדפן, ואזור גיאוגרפי כללי). כתובות ה-IP של המשתמשים עוברות התממה (Anonymization) כברירת מחדל על ידי Google.</li>
+            </ul>
+
+            <h2>2. הבסיס החוקי לעיבוד המידע (GDPR)</h2>
+            <ul>
+                <li><strong>תפעול טכני (OpenStreetMap):</strong> העברת תקשורת ה-IP לשרתי המפה היא חיונית לתפקוד הבסיסי של האתר ומבוססת על אינטרס לגיטימי (Legitimate Interest) להצגת נתוני המחקר.</li>
+                <li><strong>סטטיסטיקה (Google Analytics):</strong> עיבוד נתונים אנליטיים באמצעות עוגיות מבוסס על הסכמת המשתמש. ניתן לחסום או למחוק את קובצי העוגיות בכל עת דרך הגדרות הדפדפן ללא פגיעה בתפקוד המפה.</li>
+            </ul>
+
+            <h2>3. אבטחת מידע ושמירתו</h2>
+            <p>המידע הסטטיסטי המעובד על ידי Google Analytics נשמר בשרתי Google תחת תקני אבטחת מידע בינלאומיים מחמירים (ISO 27001, SOC 2). מאחר והאתר אינו שומר מידע אישי במערכות המקומיות, לא מאוחסן מסד נתונים רגיש החשוף לדליפת מידע.</p>
+
+            <h2>4. זכויות המשתמש</h2>
+            <p>על פי חוקי הגנת הפרטיות, עומדות לרשותך הזכויות הבאות:</p>
+            <ul>
+                <li><strong>זכות העיון:</strong> לבקש מידע אודות אופן עיבוד הנתונים הסטטיסטיים בשירותי צד שלישי המחוברים לאתר.</li>
+                <li><strong>זכות ההתנגדות ומחיקה:</strong> לנקות את קובצי העוגיות דרך הדפדפן, או להתקין תוסף חסימה (כגון Google Analytics Opt-out) כדי למנוע איסוף נתונים סטטיסטיים.</li>
+            </ul>
+
+            <h2>5. יצירת קשר בנושא פרטיות</h2>
+            <p>לכל שאלה, בקשה או הבהרה בנוגע למדיניות פרטיות זו או לניהול הנתונים בפרויקט Algae4IBD, ניתן לפנות אל:</p>
+            
+            <div class="contact-info">
+                <p><strong>איש קשר:</strong> יוסף נאגו</p>
+                <p><strong>דואר אלקטרוני:</strong> <a href="mailto:yosinago5@gmail.com">yosinago5@gmail.com</a></p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function setLang(lang) {
+            const html = document.documentElement;
+            const enSec = document.getElementById('en-content');
+            const heSec = document.getElementById('he-content');
+            const enBtn = document.getElementById('btn-en');
+            const heBtn = document.getElementById('btn-he');
+
+            if (lang === 'he') {
+                html.setAttribute('lang', 'he');
+                html.setAttribute('dir', 'rtl');
+                enSec.hidden = true;
+                heSec.hidden = false;
+                enBtn.setAttribute('aria-pressed', 'false');
+                heBtn.setAttribute('aria-pressed', 'true');
+                document.title = 'מדיניות פרטיות';
+            } else {
+                html.setAttribute('lang', 'en');
+                html.setAttribute('dir', 'ltr');
+                enSec.hidden = false;
+                heSec.hidden = true;
+                enBtn.setAttribute('aria-pressed', 'true');
+                heBtn.setAttribute('aria-pressed', 'false');
+                document.title = 'Privacy Policy';
+            }
+        }
+    </script>
+</body>
+</html>
