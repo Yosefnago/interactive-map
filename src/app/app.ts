@@ -7,6 +7,7 @@ import { DATA_LIST, PopUpData, MacroAlgaeInfo, MicroAlgaeInfo, CyanobacteriaInfo
 import * as L from 'leaflet';
 
 
+
 const REGION_BOUNDS: L.LatLngBoundsExpression = [[0, -20], [75, 100]];
 
 type AlgaeItem = MacroAlgaeInfo | MicroAlgaeInfo;

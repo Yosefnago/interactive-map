@@ -1,30 +1,194 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accessibility Statement</title>
     <style>
+        :root {
+            --primary-color: #004b92;
+            --text-color: #1a1a1a;
+            --bg-color: #ffffff;
+            --card-bg: #f8f9fa;
+            --border-color: #eaeaea;
+        }
+
         body {
             font-family: sans-serif;
             line-height: 1.6;
             max-width: 800px;
             margin: 40px auto;
             padding: 0 20px;
-            color: #1a1a1a;
+            color: var(--text-color);
+            background-color: var(--bg-color);
         }
-        h1 { border-bottom: 2px solid #eaeaea; padding-bottom: 10px; }
-        .contact-info { margin-top: 30px; font-weight: bold; }
+
+        .lang-nav {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        html[dir="rtl"] .lang-nav {
+            justify-content: flex-start;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 6px 14px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .lang-btn[aria-pressed="true"] {
+            background: var(--primary-color);
+            color: #ffffff;
+        }
+
+        .lang-btn:focus-visible, a:focus-visible {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        h1 {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-top: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        ul {
+            padding-inline-start: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .contact-info {
+            background: var(--card-bg);
+            border-inline-start: 4px solid var(--primary-color);
+            padding: 15px;
+            margin-top: 30px;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
-    <h1>Accessibility Statement</h1>
-    <p>Efforts have been made to provide an accessible user experience on this website in accordance with commonly accepted accessibility principles.</p>
-    <p>The website includes an accessible table view that provides full access to the information presented in the interactive map for keyboard and screen-reader users.</p>
-    <p>The site supports keyboard navigation, visible focus indicators, and a structured content layout.</p>
-    <p>The website was designed primarily for desktop use.</p>
-    <div class="contact-info">
-        If you encounter an accessibility issue or have feedback regarding accessibility, please contact: yosinago5@gmail.com
-    </div>
+
+    <header>
+        <nav class="lang-nav" aria-label="Language selection">
+            <button type="button" id="btn-en" class="lang-btn" aria-pressed="true" onclick="setLang('en')">English</button>
+            <button type="button" id="btn-he" class="lang-btn" aria-pressed="false" onclick="setLang('he')">עברית</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- English Content -->
+        <section id="en-content">
+            <h1>Accessibility Statement</h1>
+            <p><strong>Last Updated:</strong> July 2026</p>
+            
+            <p>We are committed to ensuring digital accessibility for people with disabilities, in accordance with the Israeli Equal Rights for Persons with Disabilities Law (1998), its accompanying Accessibility Regulations (2013), and the European Standard EN 301 549.</p>
+
+            <h2>Compliance Status and Standard</h2>
+            <p>This application conforms to the Web Content Accessibility Guidelines (WCAG) 2.1 published by the W3C at Level <strong>AA</strong>, as well as the Israeli Standard <strong>IS 5568 (Level AA)</strong>.</p>
+
+            <h2>Accessibility Features Implemented</h2>
+            <ul>
+                <li><strong>Alternative Table View:</strong> Because interactive mapping and marker clustering present technical barriers for assistive technologies, the application includes an accessible table view. This table displays all underlying data (countries, partners, and algae types: MacroAlgae, MicroAlgae, and Cyanobacteria) and is fully optimized for screen reader navigation.</li>
+                <li><strong>Keyboard Navigation:</strong> Full keyboard operation is supported using the Tab key for sequential focus navigation and Enter/Space to activate controls.</li>
+                <li><strong>Visual Focus Indicators:</strong> Clear focus rings are implemented across all interactive elements to assist keyboard users.</li>
+                <li><strong>Semantics and Scaling:</strong> Semantic HTML5 markup is used throughout, and the layout supports text scaling up to 200% without loss of functionality.</li>
+            </ul>
+
+            <h2>Exemptions (Interactive Maps)</h2>
+            <p>According to accessibility regulations, complex map canvases and marker clusters are exempt from full accessibility requirements, provided an accessible text alternative is available. The integrated Table View serves as the compliant alternative to the interactive map display.</p>
+
+            <h2>Accessibility Coordinator & Contact Information</h2>
+            <p>We continuously strive to maintain and improve the accessibility of our website. If you encounter any accessibility barriers while navigating this application or have suggestions for improvement, please reach out to our appointed Accessibility Coordinator via email:</p>
+            
+            <div class="contact-info">
+                <p><strong>Accessibility Coordinator:</strong> Yosef Nago</p>
+                <p><strong>Email:</strong> <a href="mailto:yosinago5@gmail.com">yosinago5@gmail.com</a></p>
+                <p><strong>Response Time:</strong> We make every effort to review and respond to accessibility inquiries promptly.</p>
+            </div>
+        </section>
+
+        <!-- Hebrew Content -->
+        <section id="he-content" hidden>
+            <h1>הצהרת נגישות</h1>
+            <p><strong>תאריך עדכון אחרון:</strong> יולי 2026</p>
+            
+            <p>אנו פועלים להבטחת נגישות דיגיטלית לאנשים עם מוגבלות, בהתאם לדרישות חוק שוויון זכויות לאנשים עם מוגבלות (תשנ"ח-1998), תקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), תשע"ג-2013, והתקן האירופי EN 301 549.</p>
+
+            <h2>תקינות ורמת נגישות</h2>
+            <p>האתר מותאם לעמידה בהנחיות הנגישות למידע באינטרנט (WCAG 2.1) של ארגון W3C ברמת התאמה <strong>AA</strong>, וכן בתקן הישראלי <strong>ת"י 5568 רמה AA</strong>.</p>
+
+            <h2>אמצעי הנגישות שהוטמעו במערכת</h2>
+            <ul>
+                <li><strong>תצוגת טבלה חלופית (Alternative Table View):</strong> מכיוון שמפה אינטראקטיבית וקיבוץ סמנים (Marker Clustering) מהווים אתגר טכני לטכנולוגיות מסייעות, המערכת כוללת תצוגת טבלה נגישה המציגה את מלוא הנתונים (מדינות, שותפים וסוגי אצות: MacroAlgae, MicroAlgae, Cyanobacteria). הטבלה מותאמת באופן מלא לקריאה באמצעות קוראי מסך.</li>
+                <li><strong>ניווט מקלדת:</strong> תמיכה בניווט מלא באמצעות מקש Tab ומעבר לוגי בין רכיבים, ושימוש ב-Enter או Space להפעלת אלמנטים אינטראקטיביים.</li>
+                <li><strong>חיווי ויזואלי (Focus Indicators):</strong> לכל רכיב אינטראקטיבי במערכת קיים חיווי פוקוס ברור ונראה לעין בעת ניווט באמצעות מקלדת.</li>
+                <li><strong>סמנטיקה והגדלה:</strong> שימוש בתגיות HTML5 סמנטיות ותמיכה בשינוי גודל תצוגה בדפדפן עד 200% ללא פגיעה בפונקציונליות או אובדן מידע.</li>
+            </ul>
+
+            <h2>סייגים (מפות אינטראקטיביות)</h2>
+            <p>על פי הנחיות הנגישות, רכיבי מפה מורכבים פטורים מחובת נגישות מלאה, בתנאי שהמידע המרחבי והטקסטואלי המופיע בהם זמין במלואו בחלופה טקסטואלית נגישה. תצוגת הטבלה במערכת מהווה את החלופה הנגישה התקנית למידע המוצג על גבי המפה.</p>
+
+            <h2>פרטי רכז/ת נגישות ויצירת קשר</h2>
+            <p>אנו ממשיכים במאמצים לשמר ולשפר את נגישות האתר כחלק ממחויבותנו לאפשר שימוש שוויוני לכלל האוכלוסייה. אם נתקלתם בבעיית נגישות, בקושי בגלישה, או שיש לכם הצעות לשיפור, ניתן לפנות ישירות לרכז הנגישות של הארגון באמצעות הדואר האלקטרוני:</p>
+            
+            <div class="contact-info">
+                <p><strong>שם רכז הנגישות:</strong> יוסף נאגו</p>
+                <p><strong>דואר אלקטרוני:</strong> <a href="mailto:yosinago5@gmail.com">yosinago5@gmail.com</a></p>
+                <p><strong>זמני מענה:</strong> אנו עושים את מרב המאמצים לבדוק כל פנייה בנושא נגישות ולהשיב לה בהקדם האפשרי.</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function setLang(lang) {
+            const html = document.documentElement;
+            const enSec = document.getElementById('en-content');
+            const heSec = document.getElementById('he-content');
+            const enBtn = document.getElementById('btn-en');
+            const heBtn = document.getElementById('btn-he');
+
+            if (lang === 'he') {
+                html.setAttribute('lang', 'he');
+                html.setAttribute('dir', 'rtl');
+                enSec.hidden = true;
+                heSec.hidden = false;
+                enBtn.setAttribute('aria-pressed', 'false');
+                heBtn.setAttribute('aria-pressed', 'true');
+                document.title = 'הצהרת נגישות';
+            } else {
+                html.setAttribute('lang', 'en');
+                html.setAttribute('dir', 'ltr');
+                enSec.hidden = false;
+                heSec.hidden = true;
+                enBtn.setAttribute('aria-pressed', 'true');
+                heBtn.setAttribute('aria-pressed', 'false');
+                document.title = 'Accessibility Statement';
+            }
+        }
+    </script>
 </body>
 </html>
